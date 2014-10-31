@@ -49,6 +49,8 @@ void setup(){
 }
 
 void draw(){
+  for (int col=0; col < nSlot; col++){
+     for (int row=0; row < nSlot; row++){
   switch (gameState){
     case GAME_START:
           background(180);
@@ -67,25 +69,53 @@ void draw(){
           break;
     case GAME_RUN:
           //---------------- put you code here ----
-
+      if (clickCount == totalSlots - bombCount){
+        gameState = GAME_WIN;
+      }     
           // -----------------------------------
           break;
     case GAME_WIN:
           textSize(18);
           fill(0);
           text("YOU WIN !!",width/3,30);
+          if(slot[col][row] == SLOT_BOMB){
+            showSlot(col, row, SLOT_BOMB);
+          }else if(slot[col][row] == SLOT_FLAG_BOMB){
+            showSlot(col, row, SLOT_FLAG_BOMB);
+          }
           break;
     case GAME_LOSE:
           textSize(18);
           fill(0);
           text("YOU LOSE !!",width/3,30);
+          if(slot[col][row] == SLOT_BOMB){
+            showSlot(col, row, SLOT_BOMB);
+          }else if(slot[col][row] == SLOT_FLAG_BOMB){
+            showSlot(col, row, SLOT_FLAG_BOMB);
+          }else if(slot[col][row] == SLOT_OFF){
+            showSlot(col, row, SLOT_SAFE);
+          }
           break;
+  }  
+   }
   }
 }
 
 int countNeighborBombs(int col,int row){
   // -------------- Requirement B ---------
-  return 0;
+  int count = 0;  
+  for (int i = 0 ; i < nSlot ; i++){
+    for (int j = 0 ; j < nSlot ; j++){
+      if( i + 1 == col || i - 1 == col || i == col ){
+        if( j + 1 == row || j - 1 == row || j == row ){
+          if( slot[i][j] == SLOT_BOMB || slot[i][j] == SLOT_DEAD){
+            count++;
+          }
+        }
+      }
+    }
+  }
+  return count;
 }
 
 void setBombs(){
@@ -96,8 +126,17 @@ void setBombs(){
     }
   }
   // -------------- put your code here ---------
-  // randomly set bombs
-
+  // randomly set bombs  
+  for (int n = 1; n <= bombCount; n++){ 
+    int bombX = (int)random(4);
+    int bombY = (int)random(4);  
+    if (slot[bombX][bombY] == SLOT_OFF){
+      slot[bombX][bombY] = SLOT_BOMB;  
+      //println(bombX, bombY); 
+    }else{
+      n -= 1;
+    }  
+  }
   // ---------------------------------------
 }
 
@@ -136,9 +175,13 @@ void showSlot(int col, int row, int slotState){
           }
           break;
     case SLOT_FLAG:
+          fill(255);
+          rect(x,y,SLOT_SIZE,SLOT_SIZE);
           image(flag,x,y,SLOT_SIZE,SLOT_SIZE);
           break;
     case SLOT_FLAG_BOMB:
+          fill(255);
+          rect(x,y,SLOT_SIZE,SLOT_SIZE);
           image(cross,x,y,SLOT_SIZE,SLOT_SIZE);
           break;
     case SLOT_DEAD:
@@ -174,9 +217,38 @@ void mousePressed(){
        mouseY >= iy && mouseY <= iy+sideLength){
     
     // --------------- put you code here -------     
-
-    // -------------------------
-    
+    int mouse_col = (mouseX - ix)/ SLOT_SIZE;
+    int mouse_row = (mouseY - iy)/ SLOT_SIZE;
+    if (mouseButton == LEFT){      
+      if(slot[mouse_col][mouse_row] == SLOT_BOMB){
+        showSlot(mouse_col,mouse_row, SLOT_DEAD);
+        slot[mouse_col][mouse_row] = SLOT_DEAD;
+        gameState = GAME_LOSE;
+      }else if(slot[mouse_col][mouse_row] == SLOT_OFF){
+        showSlot(mouse_col, mouse_row, SLOT_SAFE);
+        slot[mouse_col][mouse_row] = SLOT_SAFE;
+        clickCount++;
+        }
+    }else if (mouseButton == RIGHT){ 
+      if(slot[mouse_col][mouse_row] == SLOT_OFF && flagCount < bombCount){
+        showSlot(mouse_col,mouse_row, SLOT_FLAG);
+        slot[mouse_col][mouse_row] = SLOT_FLAG;
+        flagCount++;
+      }else if(slot[mouse_col][mouse_row] == SLOT_BOMB && flagCount < bombCount){
+        showSlot(mouse_col,mouse_row, SLOT_FLAG);
+        slot[mouse_col][mouse_row] = SLOT_FLAG_BOMB;
+        flagCount++;
+      }else if(slot[mouse_col][mouse_row] == SLOT_FLAG){
+        showSlot(mouse_col,mouse_row, SLOT_OFF);
+        slot[mouse_col][mouse_row] = SLOT_OFF;
+        flagCount--;
+      }else if(slot[mouse_col][mouse_row] == SLOT_FLAG_BOMB){
+        showSlot(mouse_col,mouse_row, SLOT_OFF);
+        slot[mouse_col][mouse_row] = SLOT_BOMB;
+        flagCount--;
+      }
+    }
+    // -------------------------    
   }
 }
 
