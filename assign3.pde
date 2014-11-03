@@ -128,8 +128,8 @@ void setBombs(){
   // -------------- put your code here ---------
   // randomly set bombs  
   for (int n = 1; n <= bombCount; n++){ 
-    int bombX = (int)random(4);
-    int bombY = (int)random(4);  
+    int bombX = int(random(4));
+    int bombY = int(random(4));  
     if (slot[bombX][bombY] == SLOT_OFF){
       slot[bombX][bombY] = SLOT_BOMB;  
       //println(bombX, bombY); 
@@ -217,8 +217,8 @@ void mousePressed(){
        mouseY >= iy && mouseY <= iy+sideLength){
     
     // --------------- put you code here -------     
-    int mouse_col = (int)(mouseX - ix)/ SLOT_SIZE;
-    int mouse_row = (int)(mouseY - iy)/ SLOT_SIZE;
+    int mouse_col = int((mouseX - ix)/ SLOT_SIZE);
+    int mouse_row = int((mouseY - iy)/ SLOT_SIZE);
     if (mouseButton == LEFT){      
       if(slot[mouse_col][mouse_row] == SLOT_BOMB){
         showSlot(mouse_col,mouse_row, SLOT_DEAD);
